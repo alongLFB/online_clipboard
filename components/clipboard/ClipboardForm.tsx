@@ -85,13 +85,13 @@ export function ClipboardForm() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <p className="text-sm text-gray-600 mb-2">短链接：</p>
+              <p className="text-sm text-fg-secondary mb-2">短链接：</p>
               <div className="flex gap-2">
                 <input
                   type="text"
                   readOnly
                   value={result.shortUrl}
-                  className="flex-1 px-3 py-2 border rounded-md bg-gray-50"
+                  className="flex-1 px-3 py-2 border border-input-border rounded-md bg-bg-secondary text-fg-primary"
                 />
                 <Button
                   variant="secondary"
@@ -103,17 +103,17 @@ export function ClipboardForm() {
             </div>
             
             <div>
-              <p className="text-sm text-gray-600 mb-2">二维码（扫码访问）：</p>
+              <p className="text-sm text-fg-secondary mb-2">二维码（扫码访问）：</p>
               <div className="flex justify-center">
                 <img
                   src={result.qrCodeData}
                   alt="QR Code"
-                  className="border rounded-lg p-4"
+                  className="border border-border-default rounded-lg p-4 bg-bg-secondary"
                 />
               </div>
             </div>
             
-            <p className="text-sm text-gray-500 text-center">
+            <p className="text-sm text-fg-tertiary text-center">
               内容将在 15 分钟后自动删除
             </p>
           </CardContent>

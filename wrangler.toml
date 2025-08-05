@@ -8,11 +8,11 @@ exclude = [".next/server/**", ".next/static/development/**"]
 
 [[kv_namespaces]]
 binding = "CLIPBOARD_KV"
-id = "YOUR_KV_NAMESPACE_ID"
+id = "49d39547d5504d34b9656ca32965e6a4"
 
 [env.production]
 vars = { CONTENT_EXPIRY_MINUTES = "15" }
 
 [[kv_namespaces]]
 binding = "CLIPBOARD_KV"
-id = "YOUR_PRODUCTION_KV_NAMESPACE_ID"
+id = "49d39547d5504d34b9656ca32965e6a4"

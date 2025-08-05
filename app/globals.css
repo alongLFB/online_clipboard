@@ -1,22 +1,87 @@
 @import "tailwindcss";
 
 :root {
+  /* Light theme (default) */
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #111827;
+  
+  /* Background colors */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f9fafb;
+  --bg-tertiary: #f3f4f6;
+  
+  /* Foreground colors */
+  --fg-primary: #111827;
+  --fg-secondary: #4b5563;
+  --fg-tertiary: #6b7280;
+  --fg-muted: #9ca3af;
+  
+  /* Border colors */
+  --border-default: #e5e7eb;
+  --border-subtle: #f3f4f6;
+  
+  /* Input colors */
+  --input-bg: #ffffff;
+  --input-border: #e5e7eb;
+  --input-placeholder: #9ca3af;
+  --input-focus: #3b82f6;
+  
+  /* Card colors */
+  --card-bg: #ffffff;
+  --card-border: #e5e7eb;
+}
+
+.dark {
+  /* Dark theme */
+  --background: #0f172a;
+  --foreground: #f8fafc;
+  
+  /* Background colors */
+  --bg-primary: #0f172a;
+  --bg-secondary: #1e293b;
+  --bg-tertiary: #334155;
+  
+  /* Foreground colors */
+  --fg-primary: #f8fafc;
+  --fg-secondary: #e2e8f0;
+  --fg-tertiary: #cbd5e1;
+  --fg-muted: #94a3b8;
+  
+  /* Border colors */
+  --border-default: #334155;
+  --border-subtle: #1e293b;
+  
+  /* Input colors */
+  --input-bg: #1e293b;
+  --input-border: #334155;
+  --input-placeholder: #64748b;
+  --input-focus: #3b82f6;
+  
+  /* Card colors */
+  --card-bg: #1e293b;
+  --card-border: #334155;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-bg-primary: var(--bg-primary);
+  --color-bg-secondary: var(--bg-secondary);
+  --color-bg-tertiary: var(--bg-tertiary);
+  --color-fg-primary: var(--fg-primary);
+  --color-fg-secondary: var(--fg-secondary);
+  --color-fg-tertiary: var(--fg-tertiary);
+  --color-fg-muted: var(--fg-muted);
+  --color-border-default: var(--border-default);
+  --color-border-subtle: var(--border-subtle);
+  --color-input-bg: var(--input-bg);
+  --color-input-border: var(--input-border);
+  --color-input-placeholder: var(--input-placeholder);
+  --color-input-focus: var(--input-focus);
+  --color-card-bg: var(--card-bg);
+  --color-card-border: var(--card-border);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
 }
 
 body {

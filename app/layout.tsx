@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { Toaster } from 'react-hot-toast';
-import { Header } from '@/components/layout/Header';
-import { Footer } from '@/components/layout/Footer';
+import { Toaster } from "react-hot-toast";
+import { Header } from "@/components/layout/Header";
+import { Footer } from "@/components/layout/Footer";
+import { ClientThemeProvider } from "@/components/providers/theme-provider-client";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -17,7 +18,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "在线剪贴板 - 快速分享文本内容",
-  description: "快速从电脑复制大段文本、坐标、网址等内容到手机，15分钟无人使用后自动删除",
+  description:
+    "快速从电脑复制大段文本、坐标、网址等内容到手机，15分钟无人使用后自动删除",
 };
 
 export default function RootLayout({
@@ -30,12 +32,12 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col`}
       >
-        <Header />
-        <div className="flex-1">
-          {children}
-        </div>
-        <Footer />
-        <Toaster position="top-center" />
+        <ClientThemeProvider>
+          <Header />
+          <div className="flex-1">{children}</div>
+          <Footer />
+          <Toaster position="top-center" />
+        </ClientThemeProvider>
       </body>
     </html>
   );

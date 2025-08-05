@@ -55,7 +55,7 @@ export function ClipboardView({ id }: ClipboardViewProps) {
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-[200px]">
-        <p>加载中...</p>
+        <p className="text-fg-secondary">加载中...</p>
       </div>
     );
   }
@@ -67,7 +67,7 @@ export function ClipboardView({ id }: ClipboardViewProps) {
           <CardTitle>内容不可用</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-gray-600">{error || '内容不存在或已过期'}</p>
+          <p className="text-fg-secondary">{error || '内容不存在或已过期'}</p>
           <Button
             variant="secondary"
             className="mt-4"
@@ -92,13 +92,13 @@ export function ClipboardView({ id }: ClipboardViewProps) {
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="relative">
-          <pre className="p-4 bg-gray-50 rounded-md overflow-auto max-h-96 whitespace-pre-wrap break-words">
+          <pre className="p-4 bg-bg-secondary rounded-md overflow-auto max-h-96 whitespace-pre-wrap break-words text-fg-primary">
             {clipboard.content}
           </pre>
         </div>
         
         <div className="flex justify-between items-center">
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-fg-tertiary">
             {timeRemaining}过期
           </p>
           <Button onClick={copyToClipboard}>
@@ -106,7 +106,7 @@ export function ClipboardView({ id }: ClipboardViewProps) {
           </Button>
         </div>
         
-        <div className="text-sm text-gray-500 space-y-1">
+        <div className="text-sm text-fg-tertiary space-y-1">
           <p>创建时间：{format(new Date(clipboard.createdAt), 'yyyy-MM-dd HH:mm:ss')}</p>
           <p>访问次数：{clipboard.views || 0}</p>
         </div>
