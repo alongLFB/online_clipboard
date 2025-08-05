@@ -40,6 +40,9 @@ CONTENT_EXPIRY_MINUTES=15
 CLOUDFLARE_ACCOUNT_ID=your_account_id
 CLOUDFLARE_KV_NAMESPACE_ID=your_namespace_id
 CLOUDFLARE_API_TOKEN=your_api_token
+
+# 如果使用 Cloudflare D1 数据库 (推荐，可选)
+CLOUDFLARE_D1_DATABASE_ID=your_database_id
 ```
 
 ### 5. 构建项目
@@ -78,6 +81,51 @@ pm2 save
 # 设置开机自启
 pm2 startup
 ```
+
+## 存储选项
+
+### 本地存储 (默认)
+- 使用内存存储，重启后数据丢失
+- 适合开发和测试环境
+
+### Cloudflare KV
+- 全球分布的键值存储
+- 自动 TTL 过期
+- 适合小规模部署
+
+### Cloudflare D1 (推荐)
+- 基于 SQLite 的关系数据库
+- 支持复杂查询和统计
+- 持久化存储，更可靠
+
+#### 设置 Cloudflare D1
+
+1. 登录 [Cloudflare 控制台](https://dash.cloudflare.com/)
+2. 进入 "Workers & Pages" -> "D1"
+3. 创建新数据库
+4. 获取 Database ID
+5. 创建 API Token (权限: D1:Edit)
+6. 在 `.env.local` 中配置：
+
+```bash
+CLOUDFLARE_ACCOUNT_ID=你的账户ID
+CLOUDFLARE_D1_DATABASE_ID=你的数据库ID
+CLOUDFLARE_API_TOKEN=你的API令牌
+```
+
+7. 初始化数据库表：
+
+```bash
+npm run init-d1
+```
+
+#### D1 的优势
+
+- **持久化存储**: 数据不会因重启丢失
+- **SQL 查询**: 支持复杂查询和统计
+- **全球分布**: 低延迟访问
+- **自动备份**: Cloudflare 自动处理备份
+- **成本低**: 慷慨的免费额度
 
 ## 配置选项
 
