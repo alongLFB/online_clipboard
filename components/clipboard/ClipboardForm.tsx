@@ -1,47 +1,48 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import toast from 'react-hot-toast';
-import { CreateClipboardResponse } from '@/types/clipboard';
+import { useState } from "react";
+import Image from "next/image";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import toast from "react-hot-toast";
+import { CreateClipboardResponse } from "@/types/clipboard";
 
 export function ClipboardForm() {
-  const [content, setContent] = useState('');
+  const [content, setContent] = useState("");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<CreateClipboardResponse | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!content.trim()) {
-      toast.error('请输入要分享的内容');
+      toast.error("请输入要分享的内容");
       return;
     }
 
     setLoading(true);
-    
+
     try {
-      const response = await fetch('/api/clipboard', {
-        method: 'POST',
+      const response = await fetch("/api/clipboard", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify({ content, contentType: 'text' }),
+        body: JSON.stringify({ content, contentType: "text" }),
       });
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || '创建失败');
+        throw new Error(error.error || "创建失败");
       }
 
       const data: CreateClipboardResponse = await response.json();
       setResult(data);
-      setContent('');
-      toast.success('创建成功！');
+      setContent("");
+      toast.success("创建成功！");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : '创建失败，请重试');
+      toast.error(error instanceof Error ? error.message : "创建失败，请重试");
     } finally {
       setLoading(false);
     }
@@ -50,9 +51,9 @@ export function ClipboardForm() {
   const copyToClipboard = async (text: string) => {
     try {
       await navigator.clipboard.writeText(text);
-      toast.success('已复制到剪贴板');
-    } catch (error) {
-      toast.error('复制失败');
+      toast.success("已复制到剪贴板");
+    } catch {
+      toast.error("复制失败");
     }
   };
 
@@ -72,7 +73,7 @@ export function ClipboardForm() {
               className="resize-none"
             />
             <Button type="submit" disabled={loading} className="w-full">
-              {loading ? '创建中...' : '生成短链接'}
+              {loading ? "创建中..." : "生成短链接"}
             </Button>
           </form>
         </CardContent>
@@ -101,18 +102,23 @@ export function ClipboardForm() {
                 </Button>
               </div>
             </div>
-            
+
             <div>
-              <p className="text-sm text-fg-secondary mb-2">二维码（扫码访问）：</p>
+              <p className="text-sm text-fg-secondary mb-2">
+                二维码（扫码访问）：
+              </p>
               <div className="flex justify-center">
-                <img
+                <Image
                   src={result.qrCodeData}
                   alt="QR Code"
+                  width={300}
+                  height={300}
                   className="border border-border-default rounded-lg p-4 bg-bg-secondary"
+                  unoptimized
                 />
               </div>
             </div>
-            
+
             <p className="text-sm text-fg-tertiary text-center">
               内容将在 15 分钟后自动删除
             </p>

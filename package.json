@@ -5,6 +5,9 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
+    "pages:build": "npx @cloudflare/next-on-pages",
+    "pages:dev": "npx @cloudflare/next-on-pages --dev",
+    "pages:deploy": "npm run pages:build && wrangler pages deploy .vercel/output/static --project-name=online-clipboard",
     "start": "next start",
     "lint": "next lint",
     "deploy": "npm run build && wrangler pages deploy .next --project-name=online-clipboard",
@@ -20,6 +23,7 @@
     "react-hot-toast": "^2.5.2"
   },
   "devDependencies": {
+    "@cloudflare/next-on-pages": "^1.13.13",
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
