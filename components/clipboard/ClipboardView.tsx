@@ -1,12 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { ClipboardContent } from "@/types/clipboard";
-import { format, formatDistanceToNow } from "date-fns";
-import { zhCN } from "date-fns/locale";
+import { format } from "date-fns";
 import toast from "react-hot-toast";
 import QRCode from "qrcode";
 
@@ -23,7 +22,7 @@ export function ClipboardView({ id }: ClipboardViewProps) {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [hasExpiredAndRefreshed, setHasExpiredAndRefreshed] = useState(false);
 
-  const fetchClipboard = async () => {
+  const fetchClipboard = useCallback(async () => {
     try {
       const response = await fetch(`/api/clipboard/${id}`);
 
@@ -44,31 +43,9 @@ export function ClipboardView({ id }: ClipboardViewProps) {
     } finally {
       setLoading(false);
     }
-  };
-
-  useEffect(() => {
-    fetchClipboard();
   }, [id]);
 
-  // 自动生成二维码
-  useEffect(() => {
-    if (clipboard && !qrCodeData) {
-      generateQRCode(false); // 自动生成时不显示提示
-    }
-  }, [clipboard, qrCodeData]);
-
-  // 实时更新时间
-  useEffect(() => {
-    if (!clipboard) return;
-    
-    const timer = setInterval(() => {
-      setCurrentTime(new Date());
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, [clipboard]);
-
-  const generateQRCode = async (showToast = false) => {
+  const generateQRCode = useCallback(async (showToast = false) => {
     if (!clipboard) return;
 
     setQrLoading(true);
@@ -91,7 +68,29 @@ export function ClipboardView({ id }: ClipboardViewProps) {
     } finally {
       setQrLoading(false);
     }
-  };
+  }, [clipboard]);
+
+  useEffect(() => {
+    fetchClipboard();
+  }, [fetchClipboard]);
+
+  // 自动生成二维码
+  useEffect(() => {
+    if (clipboard && !qrCodeData) {
+      generateQRCode(false); // 自动生成时不显示提示
+    }
+  }, [clipboard, qrCodeData, generateQRCode]);
+
+  // 实时更新时间
+  useEffect(() => {
+    if (!clipboard) return;
+    
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [clipboard]);
 
   const copyToClipboard = async () => {
     if (!clipboard) return;

@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { ClipboardService } from '@/lib/clipboard-service';
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const clipboardService = new ClipboardService();
     const stats = await clipboardService.getStats();

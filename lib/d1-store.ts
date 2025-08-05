@@ -6,6 +6,24 @@ interface D1Config {
   apiToken: string;
 }
 
+interface D1QueryResult {
+  results: Record<string, unknown>[];
+  success: boolean;
+  meta: Record<string, unknown>;
+}
+
+interface ClipboardRow {
+  id: string;
+  content: string;
+  created_at: number;
+  expires_at: number;
+  views: number;
+}
+
+interface CountRow {
+  count: number;
+}
+
 class CloudflareD1Store {
   private config: D1Config;
   private baseUrl: string;
@@ -15,7 +33,7 @@ class CloudflareD1Store {
     this.baseUrl = `https://api.cloudflare.com/client/v4/accounts/${config.accountId}/d1/database/${config.databaseId}`;
   }
 
-  private async query(sql: string, params: any[] = []): Promise<any> {
+  private async query(sql: string, params: unknown[] = []): Promise<D1QueryResult> {
     const response = await fetch(`${this.baseUrl}/query`, {
       method: "POST",
       headers: {
@@ -84,7 +102,7 @@ class CloudflareD1Store {
       return null;
     }
 
-    const row = result.results[0];
+    const row = result.results[0] as unknown as ClipboardRow;
     
     // 更新访问次数
     await this.incrementViews(id);
@@ -94,7 +112,7 @@ class CloudflareD1Store {
       content: row.content,
       createdAt: Number(row.created_at),
       expiresAt: Number(row.expires_at),
-      views: (row.views || 0) + 1,
+      views: (Number(row.views) || 0) + 1,
     };
   }
 
@@ -125,8 +143,8 @@ class CloudflareD1Store {
     ]);
 
     return {
-      total: totalResult.results[0].count,
-      active: activeResult.results[0].count,
+      total: Number((totalResult.results[0] as unknown as CountRow).count),
+      active: Number((activeResult.results[0] as unknown as CountRow).count),
     };
   }
 }
