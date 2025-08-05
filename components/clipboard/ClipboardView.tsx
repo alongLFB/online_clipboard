@@ -20,32 +20,55 @@ export function ClipboardView({ id }: ClipboardViewProps) {
   const [error, setError] = useState<string | null>(null);
   const [qrCodeData, setQrCodeData] = useState<string | null>(null);
   const [qrLoading, setQrLoading] = useState(false);
+  const [currentTime, setCurrentTime] = useState(new Date());
+  const [hasExpiredAndRefreshed, setHasExpiredAndRefreshed] = useState(false);
+
+  const fetchClipboard = async () => {
+    try {
+      const response = await fetch(`/api/clipboard/${id}`);
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          throw new Error("内容不存在或已过期");
+        }
+        throw new Error("获取内容失败");
+      }
+
+      const data = await response.json();
+      setClipboard(data);
+      setError(null); // 清除之前的错误
+      setHasExpiredAndRefreshed(false); // 重置过期刷新标志
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "获取内容失败");
+      setClipboard(null);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchClipboard = async () => {
-      try {
-        const response = await fetch(`/api/clipboard/${id}`);
-
-        if (!response.ok) {
-          if (response.status === 404) {
-            throw new Error("内容不存在或已过期");
-          }
-          throw new Error("获取内容失败");
-        }
-
-        const data = await response.json();
-        setClipboard(data);
-      } catch (error) {
-        setError(error instanceof Error ? error.message : "获取内容失败");
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchClipboard();
   }, [id]);
 
-  const generateQRCode = async () => {
+  // 自动生成二维码
+  useEffect(() => {
+    if (clipboard && !qrCodeData) {
+      generateQRCode(false); // 自动生成时不显示提示
+    }
+  }, [clipboard, qrCodeData]);
+
+  // 实时更新时间
+  useEffect(() => {
+    if (!clipboard) return;
+    
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [clipboard]);
+
+  const generateQRCode = async (showToast = false) => {
     if (!clipboard) return;
 
     setQrLoading(true);
@@ -60,7 +83,9 @@ export function ClipboardView({ id }: ClipboardViewProps) {
         },
       });
       setQrCodeData(qrData);
-      toast.success("二维码生成成功");
+      if (showToast) {
+        toast.success("二维码生成成功");
+      }
     } catch {
       toast.error("二维码生成失败");
     } finally {
@@ -76,6 +101,25 @@ export function ClipboardView({ id }: ClipboardViewProps) {
       toast.success("已复制到剪贴板");
     } catch {
       toast.error("复制失败");
+    }
+  };
+
+  const copyIdToClipboard = async () => {
+    try {
+      await navigator.clipboard.writeText(id);
+      toast.success("ID已复制到剪贴板");
+    } catch {
+      toast.error("复制ID失败");
+    }
+  };
+
+  const copyLinkToClipboard = async () => {
+    try {
+      const currentUrl = window.location.href;
+      await navigator.clipboard.writeText(currentUrl);
+      toast.success("链接已复制到剪贴板");
+    } catch {
+      toast.error("复制链接失败");
     }
   };
 
@@ -107,10 +151,32 @@ export function ClipboardView({ id }: ClipboardViewProps) {
     );
   }
 
-  const timeRemaining = formatDistanceToNow(new Date(clipboard.expiresAt), {
-    locale: zhCN,
-    addSuffix: true,
-  });
+  const getTimeRemaining = () => {
+    if (!clipboard) return "";
+    
+    const expiresAt = new Date(clipboard.expiresAt);
+    const diffMs = expiresAt.getTime() - currentTime.getTime();
+    
+    if (diffMs <= 0) {
+      // 当检测到过期时，重新获取数据确认服务器状态（避免重复刷新）
+      if (!hasExpiredAndRefreshed) {
+        setHasExpiredAndRefreshed(true);
+        fetchClipboard();
+      }
+      return "已过期";
+    }
+    
+    const minutes = Math.floor(diffMs / (1000 * 60));
+    const seconds = Math.floor((diffMs % (1000 * 60)) / 1000);
+    
+    if (minutes > 0) {
+      return `${minutes}分${seconds}秒后过期`;
+    } else {
+      return `${seconds}秒后过期`;
+    }
+  };
+
+  const timeRemaining = getTimeRemaining();
 
   return (
     <div className="w-full max-w-2xl mx-auto space-y-6">
@@ -126,28 +192,38 @@ export function ClipboardView({ id }: ClipboardViewProps) {
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
             <span>剪贴板内容</span>
-            <span className="text-sm font-mono text-fg-secondary bg-bg-secondary px-2 py-1 rounded">
-              {id}
-            </span>
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-mono text-fg-secondary bg-bg-secondary px-2 py-1 rounded">
+                {id}
+              </span>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={copyIdToClipboard}
+                className="h-10 w-20 p-0"
+                title="复制ID"
+              >
+                复制ID
+              </Button>
+            </div>
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="relative">
-            <pre className="p-4 bg-bg-secondary rounded-md overflow-auto max-h-96 whitespace-pre-wrap break-words text-fg-primary">
+            <pre className="p-4 bg-bg-secondary rounded-md overflow-auto max-h-96 whitespace-pre-wrap break-words text-fg-primary border-border-default border">
               {clipboard.content}
             </pre>
           </div>
 
           <div className="flex justify-between items-center">
-            <p className="text-sm text-fg-tertiary">{timeRemaining}过期</p>
+            <p className="text-sm text-fg-tertiary">{timeRemaining}</p>
             <div className="flex gap-2">
               <Button onClick={copyToClipboard}>复制内容</Button>
               <Button
                 variant="secondary"
-                onClick={generateQRCode}
-                disabled={qrLoading}
+                onClick={copyLinkToClipboard}
               >
-                {qrLoading ? "生成中..." : "生成二维码"}
+                复制链接
               </Button>
             </div>
           </div>
@@ -164,6 +240,14 @@ export function ClipboardView({ id }: ClipboardViewProps) {
                   className="border border-border-default rounded-lg p-4 bg-bg-secondary"
                   unoptimized
                 />
+              </div>
+            </div>
+          )}
+
+          {qrLoading && (
+            <div className="border-t border-border-default pt-4">
+              <div className="flex justify-center items-center py-8">
+                <p className="text-fg-secondary">生成二维码中...</p>
               </div>
             </div>
           )}
