@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { ClipboardService } from "@/lib/clipboard-service";
 
-export const runtime = "edge";
-
 const clipboardService = new ClipboardService();
 
 export async function GET(

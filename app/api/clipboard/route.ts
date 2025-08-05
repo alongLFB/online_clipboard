@@ -6,8 +6,6 @@ import {
 } from "@/types/clipboard";
 import QRCode from "qrcode";
 
-export const runtime = "edge";
-
 const clipboardService = new ClipboardService();
 
 export async function POST(request: NextRequest) {

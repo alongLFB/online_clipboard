@@ -1,7 +1,5 @@
 import { ClipboardView } from "@/components/clipboard/ClipboardView";
 
-export const runtime = "edge";
-
 export default async function ViewPage({
   params,
 }: {

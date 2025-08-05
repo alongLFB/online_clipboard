@@ -5,13 +5,12 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
-    "pages:build": "npx @cloudflare/next-on-pages",
-    "pages:dev": "npx @cloudflare/next-on-pages --dev",
-    "pages:deploy": "npm run pages:build && wrangler pages deploy .vercel/output/static --project-name=online-clipboard",
     "start": "next start",
     "lint": "next lint",
-    "deploy": "npm run build && wrangler pages deploy .next --project-name=online-clipboard",
-    "preview": "npm run build && wrangler pages dev .next --port 3001"
+    "pm2:start": "pm2 start ecosystem.config.js",
+    "pm2:stop": "pm2 stop online-clipboard",
+    "pm2:restart": "pm2 restart online-clipboard",
+    "pm2:logs": "pm2 logs online-clipboard"
   },
   "dependencies": {
     "date-fns": "^4.1.0",
@@ -23,7 +22,6 @@
     "react-hot-toast": "^2.5.2"
   },
   "devDependencies": {
-    "@cloudflare/next-on-pages": "^1.13.13",
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
@@ -33,7 +31,6 @@
     "eslint": "^9",
     "eslint-config-next": "15.4.5",
     "tailwindcss": "^4",
-    "typescript": "^5",
-    "wrangler": "^4.28.0"
+    "typescript": "^5"
   }
 }

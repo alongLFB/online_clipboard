@@ -1,12 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { ClipboardContent } from "@/types/clipboard";
 import { format, formatDistanceToNow } from "date-fns";
 import { zhCN } from "date-fns/locale";
 import toast from "react-hot-toast";
+import QRCode from "qrcode";
 
 interface ClipboardViewProps {
   id: string;
@@ -16,6 +18,8 @@ export function ClipboardView({ id }: ClipboardViewProps) {
   const [clipboard, setClipboard] = useState<ClipboardContent | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [qrCodeData, setQrCodeData] = useState<string | null>(null);
+  const [qrLoading, setQrLoading] = useState(false);
 
   useEffect(() => {
     const fetchClipboard = async () => {
@@ -40,6 +44,29 @@ export function ClipboardView({ id }: ClipboardViewProps) {
 
     fetchClipboard();
   }, [id]);
+
+  const generateQRCode = async () => {
+    if (!clipboard) return;
+
+    setQrLoading(true);
+    try {
+      const currentUrl = window.location.href;
+      const qrData = await QRCode.toDataURL(currentUrl, {
+        width: 300,
+        margin: 2,
+        color: {
+          dark: "#000000",
+          light: "#FFFFFF",
+        },
+      });
+      setQrCodeData(qrData);
+      toast.success("二维码生成成功");
+    } catch {
+      toast.error("二维码生成失败");
+    } finally {
+      setQrLoading(false);
+    }
+  };
 
   const copyToClipboard = async () => {
     if (!clipboard) return;
@@ -113,8 +140,33 @@ export function ClipboardView({ id }: ClipboardViewProps) {
 
           <div className="flex justify-between items-center">
             <p className="text-sm text-fg-tertiary">{timeRemaining}过期</p>
-            <Button onClick={copyToClipboard}>复制内容</Button>
+            <div className="flex gap-2">
+              <Button onClick={copyToClipboard}>复制内容</Button>
+              <Button
+                variant="secondary"
+                onClick={generateQRCode}
+                disabled={qrLoading}
+              >
+                {qrLoading ? "生成中..." : "生成二维码"}
+              </Button>
+            </div>
           </div>
+
+          {qrCodeData && (
+            <div className="border-t border-border-default pt-4">
+              <p className="text-sm text-fg-secondary mb-2">扫码访问：</p>
+              <div className="flex justify-center">
+                <Image
+                  src={qrCodeData}
+                  alt="QR Code"
+                  width={300}
+                  height={300}
+                  className="border border-border-default rounded-lg p-4 bg-bg-secondary"
+                  unoptimized
+                />
+              </div>
+            </div>
+          )}
 
           <div className="text-sm text-fg-tertiary space-y-1">
             <p>
