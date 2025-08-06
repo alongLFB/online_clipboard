@@ -1,0 +1,72 @@
+{
+  "loading": "Loading",
+  "app": {
+    "title": "Online Clipboard",
+    "description": "Share text content quickly, auto-delete after 15 minutes",
+    "subtitle": "Quick transfer bridge between computer and mobile"
+  },
+  "navigation": {
+    "home": "Back to Home"
+  },
+  "home": {
+    "create": {
+      "title": "Create New Space",
+      "description": "Create a new online space for copy-paste between computer and mobile",
+      "button": "Create"
+    },
+    "find": {
+      "title": "Find Space",
+      "description": "Find an existing online space using its identifier code",
+      "button": "Find"
+    },
+    "instructions": {
+      "title": "How to Use",
+      "step1": "Paste or input content to share",
+      "step2": "Get short link or scan QR code",
+      "step3": "Access and copy content on other devices"
+    }
+  },
+  "create": {
+    "title": "Create Clipboard",
+    "placeholder": "Paste text, URLs, coordinates, etc...",
+    "creating": "Creating...",
+    "submit": "Create and Share",
+    "success": "Created successfully! Redirecting...",
+    "error": {
+      "empty": "Please enter content to share",
+      "failed": "Creation failed",
+      "retry": "Creation failed, please try again"
+    }
+  },
+  "find": {
+    "title": "Find Clipboard",
+    "placeholder": "Enter identifier code (e.g., abc123)",
+    "searching": "Searching...",
+    "submit": "Find",
+    "error": {
+      "empty": "Please enter identifier code",
+      "notFound": "Identifier code does not exist or has expired",
+      "failed": "Search failed, please try again"
+    }
+  },
+  "clipboard": {
+    "share": "Share",
+    "copy": "Copy",
+    "copied": "Copied successfully",
+    "copyFailed": "Copy failed",
+    "qrCode": "QR Code",
+    "shortLink": "Link",
+    "content": "Content",
+    "notFound": "Clipboard does not exist or has expired",
+    "expired": "Expired",
+    "timeRemaining": "{minutes}m {seconds}s left",
+    "timeRemainingSeconds": "{seconds}s left",
+    "createdAt": "Created",
+    "views": "Views"
+  },
+  "footer": {
+    "rights": "All rights reserved",
+    "author": "Author",
+    "warning": "Security Notice: Do not share sensitive information, all content will be automatically deleted after 15 minutes"
+  }
+}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { CreateClipboard } from "@/components/clipboard/CreateClipboard";
 import { FindClipboard } from "@/components/clipboard/FindClipboard";
@@ -9,13 +10,14 @@ type ActiveView = "home" | "create" | "find";
 
 export default function Home() {
   const [activeView, setActiveView] = useState<ActiveView>("home");
+  const t = useTranslations();
 
   if (activeView === "create") {
     return (
       <main className="container mx-auto px-4 py-8">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold mb-2">在线剪贴板</h1>
-          <p className="text-gray-600">快速分享文本内容，15分钟后自动删除</p>
+          <h1 className="text-3xl font-bold mb-2">{t("app.title")}</h1>
+          <p className="text-gray-600">{t("app.description")}</p>
         </div>
         <div className="w-full max-w-2xl mx-auto space-y-6">
           <Button
@@ -23,7 +25,7 @@ export default function Home() {
             onClick={() => setActiveView("home")}
             className="mb-4"
           >
-            ← 返回首页
+            ← {t("navigation.home")}
           </Button>
           <CreateClipboard />
         </div>
@@ -35,8 +37,8 @@ export default function Home() {
     return (
       <main className="container mx-auto px-4 py-8">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold mb-2">在线剪贴板</h1>
-          <p className="text-gray-600">快速分享文本内容，15分钟后自动删除</p>
+          <h1 className="text-3xl font-bold mb-2">{t("app.title")}</h1>
+          <p className="text-gray-600">{t("app.description")}</p>
         </div>
         <div className="w-full max-w-2xl mx-auto space-y-6">
           <Button
@@ -44,7 +46,7 @@ export default function Home() {
             onClick={() => setActiveView("home")}
             className="mb-4"
           >
-            ← 返回首页
+            ← {t("navigation.home")}
           </Button>
           <FindClipboard />
         </div>
@@ -55,11 +57,11 @@ export default function Home() {
   return (
     <main className="container mx-auto px-4 py-8">
       <div className="text-center mb-12">
-        <h1 className="text-4xl font-bold mb-4 text-fg-primary">在线剪贴板</h1>
-        <p className="text-xl text-fg-secondary mb-2">
-          电脑与手机之间的快速传输桥梁
-        </p>
-        <p className="text-fg-tertiary">快速分享文本内容，15分钟后自动删除</p>
+        <h1 className="text-4xl font-bold mb-4 text-fg-primary">
+          {t("app.title")}
+        </h1>
+        <p className="text-xl text-fg-secondary mb-2">{t("app.subtitle")}</p>
+        <p className="text-fg-tertiary">{t("app.description")}</p>
       </div>
 
       <div className="w-full max-w-4xl mx-auto">
@@ -84,10 +86,10 @@ export default function Home() {
                 </svg>
               </div>
               <h2 className="text-2xl font-bold mb-2 text-fg-primary">
-                创建新空间
+                {t("home.create.title")}
               </h2>
               <p className="text-fg-secondary mb-6">
-                新建一块用于电脑和手机之间复制粘贴的在线空间
+                {t("home.create.description")}
               </p>
             </div>
             <Button
@@ -95,7 +97,7 @@ export default function Home() {
               className="w-full py-3 text-lg"
               size="lg"
             >
-              贴一块
+              {t("home.create.button")}
             </Button>
           </div>
 
@@ -119,10 +121,10 @@ export default function Home() {
                 </svg>
               </div>
               <h2 className="text-2xl font-bold mb-2 text-fg-primary">
-                查找空间
+                {t("home.find.title")}
               </h2>
               <p className="text-fg-secondary mb-6">
-                根据识别码查找一块已经存在的在线空间
+                {t("home.find.description")}
               </p>
             </div>
             <Button
@@ -131,7 +133,7 @@ export default function Home() {
               className="w-full py-3 text-lg"
               size="lg"
             >
-              查找
+              {t("home.find.button")}
             </Button>
           </div>
         </div>
@@ -139,7 +141,7 @@ export default function Home() {
         {/* 使用说明 */}
         <div className="mt-12 text-center">
           <h3 className="text-lg font-semibold mb-4 text-fg-primary">
-            使用说明
+            {t("home.instructions.title")}
           </h3>
           <div className="grid md:grid-cols-3 gap-6 text-sm text-fg-secondary">
             <div>
@@ -148,7 +150,7 @@ export default function Home() {
                   1
                 </span>
               </div>
-              <p>粘贴或输入要分享的内容</p>
+              <p>{t("home.instructions.step1")}</p>
             </div>
             <div>
               <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mx-auto mb-2">
@@ -156,7 +158,7 @@ export default function Home() {
                   2
                 </span>
               </div>
-              <p>获取短链接或扫描二维码</p>
+              <p>{t("home.instructions.step2")}</p>
             </div>
             <div>
               <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mx-auto mb-2">
@@ -164,12 +166,10 @@ export default function Home() {
                   3
                 </span>
               </div>
-              <p>在其他设备上访问并复制内容</p>
+              <p>{t("home.instructions.step3")}</p>
             </div>
           </div>
         </div>
-
-        
       </div>
     </main>
   );

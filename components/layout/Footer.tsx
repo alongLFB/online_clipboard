@@ -1,10 +1,19 @@
+"use client";
+
+import { useTranslations } from "next-intl";
+
 export function Footer() {
+  const t = useTranslations();
+
   return (
     <footer className="border-t border-border-default mt-auto">
       <div className="text-center mx-auto px-4 py-4">
-        <p>© 2025 在线剪贴板. 保留所有权利.</p>
         <p>
-          作者: <span className="text-fg-secondary">alongLFB</span> |
+          © 2025 {t("app.title")}. {t("footer.rights")}.
+        </p>
+        <p>
+          {t("footer.author")}:{" "}
+          <span className="text-fg-secondary">alongLFB</span> |
           <a
             href="https://github.com/alongLFB/online_clipboard"
             target="_blank"
@@ -15,7 +24,7 @@ export function Footer() {
           </a>
         </p>
         <p className="text-center text-sm text-fg-secondary">
-          安全提示：请勿分享敏感信息，所有内容将在15分钟后自动删除
+          {t("footer.warning")}
         </p>
       </div>
     </footer>

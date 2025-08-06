@@ -3,7 +3,7 @@ import { ClipboardView } from "@/components/clipboard/ClipboardView";
 export default async function ViewPage({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: Promise<{ locale: string; id: string }>;
 }) {
   const { id } = await params;
 

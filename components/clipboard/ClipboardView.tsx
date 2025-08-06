@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
+import { useTranslations, useLocale } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { ClipboardContent } from "@/types/clipboard";
@@ -21,6 +22,8 @@ export function ClipboardView({ id }: ClipboardViewProps) {
   const [qrLoading, setQrLoading] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [hasExpiredAndRefreshed, setHasExpiredAndRefreshed] = useState(false);
+  const locale = useLocale();
+  const t = useTranslations();
 
   const fetchClipboard = useCallback(async () => {
     try {
@@ -28,9 +31,9 @@ export function ClipboardView({ id }: ClipboardViewProps) {
 
       if (!response.ok) {
         if (response.status === 404) {
-          throw new Error("内容不存在或已过期");
+          throw new Error(t("clipboard.notFound"));
         }
-        throw new Error("获取内容失败");
+        throw new Error(t("clipboard.notFound"));
       }
 
       const data = await response.json();
@@ -38,37 +41,42 @@ export function ClipboardView({ id }: ClipboardViewProps) {
       setError(null); // 清除之前的错误
       setHasExpiredAndRefreshed(false); // 重置过期刷新标志
     } catch (error) {
-      setError(error instanceof Error ? error.message : "获取内容失败");
+      setError(
+        error instanceof Error ? error.message : t("clipboard.notFound")
+      );
       setClipboard(null);
     } finally {
       setLoading(false);
     }
-  }, [id]);
+  }, [id, t]);
 
-  const generateQRCode = useCallback(async (showToast = false) => {
-    if (!clipboard) return;
+  const generateQRCode = useCallback(
+    async (showToast = false) => {
+      if (!clipboard) return;
 
-    setQrLoading(true);
-    try {
-      const currentUrl = window.location.href;
-      const qrData = await QRCode.toDataURL(currentUrl, {
-        width: 300,
-        margin: 2,
-        color: {
-          dark: "#000000",
-          light: "#FFFFFF",
-        },
-      });
-      setQrCodeData(qrData);
-      if (showToast) {
-        toast.success("二维码生成成功");
+      setQrLoading(true);
+      try {
+        const currentUrl = window.location.href;
+        const qrData = await QRCode.toDataURL(currentUrl, {
+          width: 300,
+          margin: 2,
+          color: {
+            dark: "#000000",
+            light: "#FFFFFF",
+          },
+        });
+        setQrCodeData(qrData);
+        if (showToast) {
+          toast.success(t("clipboard.qrCode"));
+        }
+      } catch {
+        toast.error(t("clipboard.qrCode"));
+      } finally {
+        setQrLoading(false);
       }
-    } catch {
-      toast.error("二维码生成失败");
-    } finally {
-      setQrLoading(false);
-    }
-  }, [clipboard]);
+    },
+    [clipboard, t]
+  );
 
   useEffect(() => {
     fetchClipboard();
@@ -84,7 +92,7 @@ export function ClipboardView({ id }: ClipboardViewProps) {
   // 实时更新时间
   useEffect(() => {
     if (!clipboard) return;
-    
+
     const timer = setInterval(() => {
       setCurrentTime(new Date());
     }, 1000);
@@ -97,18 +105,18 @@ export function ClipboardView({ id }: ClipboardViewProps) {
 
     try {
       await navigator.clipboard.writeText(clipboard.content);
-      toast.success("已复制到剪贴板");
+      toast.success(t("clipboard.copied"));
     } catch {
-      toast.error("复制失败");
+      toast.error(t("clipboard.copyFailed"));
     }
   };
 
   const copyIdToClipboard = async () => {
     try {
       await navigator.clipboard.writeText(id);
-      toast.success("ID已复制到剪贴板");
+      toast.success(t("clipboard.copied"));
     } catch {
-      toast.error("复制ID失败");
+      toast.error(t("clipboard.copyFailed"));
     }
   };
 
@@ -116,16 +124,16 @@ export function ClipboardView({ id }: ClipboardViewProps) {
     try {
       const currentUrl = window.location.href;
       await navigator.clipboard.writeText(currentUrl);
-      toast.success("链接已复制到剪贴板");
+      toast.success(t("clipboard.copied"));
     } catch {
-      toast.error("复制链接失败");
+      toast.error(t("clipboard.copyFailed"));
     }
   };
 
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-[200px]">
-        <p className="text-fg-secondary">加载中...</p>
+        <p className="text-fg-secondary">{t("loading")}...</p>
       </div>
     );
   }
@@ -134,16 +142,18 @@ export function ClipboardView({ id }: ClipboardViewProps) {
     return (
       <Card className="w-full max-w-2xl mx-auto">
         <CardHeader>
-          <CardTitle>内容不可用</CardTitle>
+          <CardTitle>{t("clipboard.notFound")}</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-fg-secondary">{error || "内容不存在或已过期"}</p>
+          <p className="text-fg-secondary">
+            {error || t("clipboard.notFound")}
+          </p>
           <Button
             variant="secondary"
             className="mt-4"
-            onClick={() => (window.location.href = "/")}
+            onClick={() => (window.location.href = `/${locale}`)}
           >
-            返回首页
+            {t("navigation.home")}
           </Button>
         </CardContent>
       </Card>
@@ -152,26 +162,26 @@ export function ClipboardView({ id }: ClipboardViewProps) {
 
   const getTimeRemaining = () => {
     if (!clipboard) return "";
-    
+
     const expiresAt = new Date(clipboard.expiresAt);
     const diffMs = expiresAt.getTime() - currentTime.getTime();
-    
+
     if (diffMs <= 0) {
       // 当检测到过期时，重新获取数据确认服务器状态（避免重复刷新）
       if (!hasExpiredAndRefreshed) {
         setHasExpiredAndRefreshed(true);
         fetchClipboard();
       }
-      return "已过期";
+      return t("clipboard.expired");
     }
-    
+
     const minutes = Math.floor(diffMs / (1000 * 60));
     const seconds = Math.floor((diffMs % (1000 * 60)) / 1000);
-    
+
     if (minutes > 0) {
-      return `${minutes}分${seconds}秒后过期`;
+      return t("clipboard.timeRemaining", { minutes, seconds });
     } else {
-      return `${seconds}秒后过期`;
+      return t("clipboard.timeRemainingSeconds", { seconds });
     }
   };
 
@@ -181,16 +191,16 @@ export function ClipboardView({ id }: ClipboardViewProps) {
     <div className="w-full max-w-2xl mx-auto space-y-6">
       <Button
         variant="ghost"
-        onClick={() => (window.location.href = "/")}
+        onClick={() => (window.location.href = `/${locale}`)}
         className="mb-4"
       >
-        ← 返回首页
+        ← {t("navigation.home")}
       </Button>
 
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
-            <span>剪贴板内容</span>
+            <span>{t("clipboard.content")}</span>
             <div className="flex items-center gap-2">
               <span className="text-sm font-mono text-fg-secondary bg-bg-secondary px-2 py-1 rounded">
                 {id}
@@ -200,9 +210,9 @@ export function ClipboardView({ id }: ClipboardViewProps) {
                 size="sm"
                 onClick={copyIdToClipboard}
                 className="h-10 w-20 p-0"
-                title="复制ID"
+                title={t("clipboard.copy")}
               >
-                复制ID
+                {t("clipboard.copy")}
               </Button>
             </div>
           </CardTitle>
@@ -217,19 +227,20 @@ export function ClipboardView({ id }: ClipboardViewProps) {
           <div className="flex justify-between items-center">
             <p className="text-sm text-fg-tertiary">{timeRemaining}</p>
             <div className="flex gap-2">
-              <Button onClick={copyToClipboard}>复制内容</Button>
-              <Button
-                variant="secondary"
-                onClick={copyLinkToClipboard}
-              >
-                复制链接
+              <Button onClick={copyToClipboard}>
+                {t("clipboard.copy")} {t("clipboard.content")}
+              </Button>
+              <Button variant="secondary" onClick={copyLinkToClipboard}>
+                {t("clipboard.copy")} {t("clipboard.shortLink")}
               </Button>
             </div>
           </div>
 
           {qrCodeData && (
             <div className="border-t border-border-default pt-4">
-              <p className="text-sm text-fg-secondary mb-2">扫码访问：</p>
+              <p className="text-sm text-fg-secondary mb-2">
+                {t("clipboard.qrCode")}：
+              </p>
               <div className="flex justify-center">
                 <Image
                   src={qrCodeData}
@@ -246,17 +257,21 @@ export function ClipboardView({ id }: ClipboardViewProps) {
           {qrLoading && (
             <div className="border-t border-border-default pt-4">
               <div className="flex justify-center items-center py-8">
-                <p className="text-fg-secondary">生成二维码中...</p>
+                <p className="text-fg-secondary">
+                  {t("loading")} {t("clipboard.qrCode")}...
+                </p>
               </div>
             </div>
           )}
 
           <div className="text-sm text-fg-tertiary space-y-1">
             <p>
-              创建时间：
+              {t("clipboard.createdAt")}：
               {format(new Date(clipboard.createdAt), "yyyy-MM-dd HH:mm:ss")}
             </p>
-            <p>访问次数：{clipboard.views || 0}</p>
+            <p>
+              {t("clipboard.views")}：{clipboard.views || 0}
+            </p>
           </div>
         </CardContent>
       </Card>

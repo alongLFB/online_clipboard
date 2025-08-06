@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations, useLocale } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
@@ -12,12 +13,14 @@ export function CreateClipboard() {
   const [content, setContent] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const locale = useLocale();
+  const t = useTranslations();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!content.trim()) {
-      toast.error("请输入要分享的内容");
+      toast.error(t("create.error.empty"));
       return;
     }
 
@@ -34,16 +37,18 @@ export function CreateClipboard() {
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || "创建失败");
+        throw new Error(error.error || t("create.error.failed"));
       }
 
       const data: CreateClipboardResponse = await response.json();
-      toast.success("创建成功！正在跳转...");
+      toast.success(t("create.success"));
 
       // 创建成功后跳转到详情页
-      router.push(`/${data.id}`);
+      router.push(`/${locale}/${data.id}`);
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "创建失败，请重试");
+      toast.error(
+        error instanceof Error ? error.message : t("create.error.retry")
+      );
     } finally {
       setLoading(false);
     }
@@ -52,19 +57,19 @@ export function CreateClipboard() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>贴一块</CardTitle>
+        <CardTitle>{t("create.title")}</CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
           <Textarea
-            placeholder="粘贴文本、网址、坐标等内容..."
+            placeholder={t("create.placeholder")}
             value={content}
             onChange={(e) => setContent(e.target.value)}
             rows={8}
             className="resize-none"
           />
           <Button type="submit" disabled={loading} className="w-full">
-            {loading ? "创建中..." : "创建并分享"}
+            {loading ? t("create.creating") : t("create.submit")}
           </Button>
         </form>
       </CardContent>
